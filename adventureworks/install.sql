@@ -221,8 +221,8 @@ CREATE SCHEMA HumanResources
     Gender char(1) NOT NULL,
     HireDate DATE NOT NULL,
     SalariedFlag "Flag" NOT NULL CONSTRAINT "DF_Employee_SalariedFlag" DEFAULT (true),
-    VacationHours smallint NOT NULL CONSTRAINT "DF_Employee_VacationHours" DEFAULT (0),
-    SickLeaveHours smallint NOT NULL CONSTRAINT "DF_Employee_SickLeaveHours" DEFAULT (0),
+    VacationHours INT NOT NULL CONSTRAINT "DF_Employee_VacationHours" DEFAULT (0),
+    SickLeaveHours INT NOT NULL CONSTRAINT "DF_Employee_SickLeaveHours" DEFAULT (0),
     CurrentFlag "Flag" NOT NULL CONSTRAINT "DF_Employee_CurrentFlag" DEFAULT (true),
     rowguid uuid NOT NULL CONSTRAINT "DF_Employee_rowguid" DEFAULT (uuid_generate_v1()), -- ROWGUIDCOL
     ModifiedDate TIMESTAMP NOT NULL CONSTRAINT "DF_Employee_ModifiedDate" DEFAULT (NOW()),
@@ -235,8 +235,8 @@ CREATE SCHEMA HumanResources
   )
   CREATE TABLE EmployeeDepartmentHistory(
     BusinessEntityID INT NOT NULL,
-    DepartmentID smallint NOT NULL,
-    ShiftID smallint NOT NULL, -- tinyint
+    DepartmentID INT NOT NULL,
+    ShiftID INT NOT NULL, -- tinyint
     StartDate DATE NOT NULL,
     EndDate DATE NULL,
     ModifiedDate TIMESTAMP NOT NULL CONSTRAINT "DF_EmployeeDepartmentHistory_ModifiedDate" DEFAULT (NOW()),
@@ -246,7 +246,7 @@ CREATE SCHEMA HumanResources
     BusinessEntityID INT NOT NULL,
     RateChangeDate TIMESTAMP NOT NULL,
     Rate numeric NOT NULL, -- money
-    PayFrequency smallint NOT NULL,  -- tinyint
+    PayFrequency INT NOT NULL,  -- tinyint
     ModifiedDate TIMESTAMP NOT NULL CONSTRAINT "DF_EmployeePayHistory_ModifiedDate" DEFAULT (NOW()),
     CONSTRAINT "CK_EmployeePayHistory_PayFrequency" CHECK (PayFrequency IN (1, 2)), -- 1 = monthly salary, 2 = biweekly salary
     CONSTRAINT "CK_EmployeePayHistory_Rate" CHECK (Rate BETWEEN 6.50 AND 200.00)
@@ -374,7 +374,7 @@ CREATE SCHEMA Production
     StartDate TIMESTAMP NOT NULL CONSTRAINT "DF_BillOfMaterials_StartDate" DEFAULT (NOW()),
     EndDate TIMESTAMP NULL,
     UnitMeasureCode char(3) NOT NULL,
-    BOMLevel smallint NOT NULL,
+    BOMLevel INT NOT NULL,
     PerAssemblyQty decimal(8, 2) NOT NULL CONSTRAINT "DF_BillOfMaterials_PerAssemblyQty" DEFAULT (1.00),
     ModifiedDate TIMESTAMP NOT NULL CONSTRAINT "DF_BillOfMaterials_ModifiedDate" DEFAULT (NOW()),
     CONSTRAINT "CK_BillOfMaterials_EndDate" CHECK ((EndDate > StartDate) OR (EndDate IS NULL)),
@@ -399,7 +399,7 @@ CREATE SCHEMA Production
     FileExtension varchar(8) NULL,
     Revision char(5) NOT NULL,
     ChangeNumber INT NOT NULL CONSTRAINT "DF_Document_ChangeNumber" DEFAULT (0),
-    Status smallint NOT NULL, -- tinyint
+    Status INT NOT NULL, -- tinyint
     DocumentSummary text NULL,
     Document bytea  NULL, -- varbinary
     rowguid uuid NOT NULL UNIQUE CONSTRAINT "DF_Document_rowguid" DEFAULT (uuid_generate_v1()), -- ROWGUIDCOL
@@ -434,8 +434,8 @@ CREATE SCHEMA Production
     MakeFlag "Flag" NOT NULL CONSTRAINT "DF_Product_MakeFlag" DEFAULT (true),
     FinishedGoodsFlag "Flag" NOT NULL CONSTRAINT "DF_Product_FinishedGoodsFlag" DEFAULT (true),
     Color varchar(15) NULL,
-    SafetyStockLevel smallint NOT NULL,
-    ReorderPoint smallint NOT NULL,
+    SafetyStockLevel INT NOT NULL,
+    ReorderPoint INT NOT NULL,
     StandardCost numeric NOT NULL, -- money
     ListPrice numeric NOT NULL, -- money
     Size varchar(5) NULL,
@@ -495,10 +495,10 @@ CREATE SCHEMA Production
   )
   CREATE TABLE ProductInventory(
     ProductID INT NOT NULL,
-    LocationID smallint NOT NULL,
+    LocationID INT NOT NULL,
     Shelf varchar(10) NOT NULL,
-    Bin smallint NOT NULL, -- tinyint
-    Quantity smallint NOT NULL CONSTRAINT "DF_ProductInventory_Quantity" DEFAULT (0),
+    Bin INT NOT NULL, -- tinyint
+    Quantity INT NOT NULL CONSTRAINT "DF_ProductInventory_Quantity" DEFAULT (0),
     rowguid uuid NOT NULL CONSTRAINT "DF_ProductInventory_rowguid" DEFAULT (uuid_generate_v1()), -- ROWGUIDCOL
     ModifiedDate TIMESTAMP NOT NULL CONSTRAINT "DF_ProductInventory_ModifiedDate" DEFAULT (NOW()),
 --    CONSTRAINT "CK_ProductInventory_Shelf" CHECK ((Shelf LIKE 'AZa-z]') OR (Shelf = 'N/A')),
@@ -593,11 +593,11 @@ CREATE SCHEMA Production
     ProductID INT NOT NULL,
     OrderQty INT NOT NULL,
     StockedQty INT, -- AS ISNULL(OrderQty - ScrappedQty, 0),
-    ScrappedQty smallint NOT NULL,
+    ScrappedQty INT NOT NULL,
     StartDate TIMESTAMP NOT NULL,
     EndDate TIMESTAMP NULL,
     DueDate TIMESTAMP NOT NULL,
-    ScrapReasonID smallint NULL,
+    ScrapReasonID INT NULL,
     ModifiedDate TIMESTAMP NOT NULL CONSTRAINT "DF_WorkOrder_ModifiedDate" DEFAULT (NOW()),
     CONSTRAINT "CK_WorkOrder_OrderQty" CHECK (OrderQty > 0),
     CONSTRAINT "CK_WorkOrder_ScrappedQty" CHECK (ScrappedQty >= 0),
@@ -606,8 +606,8 @@ CREATE SCHEMA Production
   CREATE TABLE WorkOrderRouting(
     WorkOrderID INT NOT NULL,
     ProductID INT NOT NULL,
-    OperationSequence smallint NOT NULL,
-    LocationID smallint NOT NULL,
+    OperationSequence INT NOT NULL,
+    LocationID INT NOT NULL,
     ScheduledStartDate TIMESTAMP NOT NULL,
     ScheduledEndDate TIMESTAMP NOT NULL,
     ActualStartDate TIMESTAMP NULL,
@@ -914,7 +914,7 @@ CREATE SCHEMA Purchasing
     PurchaseOrderID INT NOT NULL,
     PurchaseOrderDetailID SERIAL NOT NULL, -- int
     DueDate TIMESTAMP NOT NULL,
-    OrderQty smallint NOT NULL,
+    OrderQty INT NOT NULL,
     ProductID INT NOT NULL,
     UnitPrice numeric NOT NULL, -- money
     LineTotal numeric, -- AS ISNULL(OrderQty * UnitPrice, 0.00),
@@ -929,8 +929,8 @@ CREATE SCHEMA Purchasing
   )
   CREATE TABLE PurchaseOrderHeader(
     PurchaseOrderID SERIAL NOT NULL,  -- int
-    RevisionNumber smallint NOT NULL CONSTRAINT "DF_PurchaseOrderHeader_RevisionNumber" DEFAULT (0),  -- tinyint
-    Status smallint NOT NULL CONSTRAINT "DF_PurchaseOrderHeader_Status" DEFAULT (1),  -- tinyint
+    RevisionNumber INT NOT NULL CONSTRAINT "DF_PurchaseOrderHeader_RevisionNumber" DEFAULT (0),  -- tinyint
+    Status INT NOT NULL CONSTRAINT "DF_PurchaseOrderHeader_Status" DEFAULT (1),  -- tinyint
     EmployeeID INT NOT NULL,
     VendorID INT NOT NULL,
     ShipMethodID INT NOT NULL,
@@ -961,7 +961,7 @@ CREATE SCHEMA Purchasing
     BusinessEntityID INT NOT NULL,
     AccountNumber "AccountNumber" NOT NULL,
     Name "Name" NOT NULL,
-    CreditRating smallint NOT NULL, -- tinyint
+    CreditRating INT NOT NULL, -- tinyint
     PreferredVendorStatus "Flag" NOT NULL CONSTRAINT "DF_Vendor_PreferredVendorStatus" DEFAULT (true),
     ActiveFlag "Flag" NOT NULL CONSTRAINT "DF_Vendor_ActiveFlag" DEFAULT (true),
     PurchasingWebServiceURL varchar(1024) NULL,
@@ -999,8 +999,8 @@ CREATE SCHEMA Sales
     CreditCardID SERIAL NOT NULL, -- int
     CardType varchar(50) NOT NULL,
     CardNumber varchar(25) NOT NULL,
-    ExpMonth smallint NOT NULL, -- tinyint
-    ExpYear smallint NOT NULL,
+    ExpMonth INT NOT NULL, -- tinyint
+    ExpYear INT NOT NULL,
     ModifiedDate TIMESTAMP NOT NULL CONSTRAINT "DF_CreditCard_ModifiedDate" DEFAULT (NOW())
   )
   CREATE TABLE Currency(
@@ -1036,7 +1036,7 @@ CREATE SCHEMA Sales
     SalesOrderID INT NOT NULL,
     SalesOrderDetailID SERIAL NOT NULL, -- int
     CarrierTrackingNumber varchar(25) NULL,
-    OrderQty smallint NOT NULL,
+    OrderQty INT NOT NULL,
     ProductID INT NOT NULL,
     SpecialOfferID INT NOT NULL,
     UnitPrice numeric NOT NULL, -- money
@@ -1050,11 +1050,11 @@ CREATE SCHEMA Sales
   )
   CREATE TABLE SalesOrderHeader(
     SalesOrderID SERIAL NOT NULL, --  NOT FOR REPLICATION -- int
-    RevisionNumber smallint NOT NULL CONSTRAINT "DF_SalesOrderHeader_RevisionNumber" DEFAULT (0), -- tinyint
+    RevisionNumber INT NOT NULL CONSTRAINT "DF_SalesOrderHeader_RevisionNumber" DEFAULT (0), -- tinyint
     OrderDate TIMESTAMP NOT NULL CONSTRAINT "DF_SalesOrderHeader_OrderDate" DEFAULT (NOW()),
     DueDate TIMESTAMP NOT NULL,
     ShipDate TIMESTAMP NULL,
-    Status smallint NOT NULL CONSTRAINT "DF_SalesOrderHeader_Status" DEFAULT (1), -- tinyint
+    Status INT NOT NULL CONSTRAINT "DF_SalesOrderHeader_Status" DEFAULT (1), -- tinyint
     OnlineOrderFlag "Flag" NOT NULL CONSTRAINT "DF_SalesOrderHeader_OnlineOrderFlag" DEFAULT (true),
     SalesOrderNumber VARCHAR(23), -- AS ISNULL(N'SO' + CONVERT(nvarchar(23), SalesOrderID), N'*** ERROR ***'),
     PurchaseOrderNumber "OrderNumber" NULL,
@@ -1120,7 +1120,7 @@ CREATE SCHEMA Sales
   CREATE TABLE SalesTaxRate(
     SalesTaxRateID SERIAL NOT NULL, -- int
     StateProvinceID INT NOT NULL,
-    TaxType smallint NOT NULL, -- tinyint
+    TaxType INT NOT NULL, -- tinyint
     TaxRate numeric NOT NULL CONSTRAINT "DF_SalesTaxRate_TaxRate" DEFAULT (0.00), -- smallmoney -- money
     Name "Name" NOT NULL,
     rowguid uuid NOT NULL CONSTRAINT "DF_SalesTaxRate_rowguid" DEFAULT (uuid_generate_v1()), -- ROWGUIDCOL
